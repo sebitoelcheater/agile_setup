@@ -1,0 +1,431 @@
+
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>Creación de proyectos ágiles usando integración continua</title>
+  <meta name="author" content="Launch School">
+
+  
+  <meta name="description" content="Tutorial básico para creación de proyectos usando la metodología de Integración Continua">
+  
+  
+
+  <!-- http://t.co/dKP3o1e -->
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+  <link rel="canonical" href="https://launchschool.com/blog/how-to-install-ruby-on-rails-development-environment-for-mac-os-x">
+  <link href="blog/favicon.ico" rel="icon">
+  <link href="css/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <link href="css/data-table.css" media="screen, projection" rel="stylesheet" type="text/css" />
+  <link href="/blog/atom.xml" rel="alternate" title="Launch School Blog" type="application/atom+xml">
+  <script src="/blog/javascripts/modernizr-2.0.js"></script>
+  <link rel="stylesheet" media="screen" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.4.0/css/font-awesome.min.css">
+  <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+  <script src="//use.typekit.net/ojn6sam.js"></script>
+  <script>try{Typekit.load();}catch(e){}</script>
+  <script>!window.jQuery && document.write(unescape('%3Cscript src="./javascripts/lib/jquery.min.js"%3E%3C/script%3E'))</script>
+  <script src="/blog/javascripts/octopress.js" type="text/javascript"></script>
+  <script src="/blog/javascripts/jquery.cookie.js" type="text/javascript"></script>
+  <script>
+    $.cookie('_blog', 'true', { expires: 90, path: '/' });
+  </script>
+  <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
+<link href="//fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<link href='//fonts.googleapis.com/css?family=Open+Sans' rel='stylesheet' type='text/css'>
+<link href='//fonts.googleapis.com/css?family=Fjalla+One' rel='stylesheet' type='text/css'>
+
+<link href="video-js.min.css" rel="stylesheet" type="text/css">
+
+<style>
+  article video { border: none; }
+  .video-js {
+    background-color: #fff;
+    padding-top: 56.25%;
+    max-width: 100%;
+    height: auto;
+  }
+  .vjs-fullscreen { padding-top: 0px }
+  .video-js .vjs-big-play-button {
+    left: 50%;
+    margin-left: -45px;
+    top: 50%;
+    margin-top: -22px;
+  }
+  .video-js .vjs-poster {
+    background-color: #fff;
+  }
+</style>
+
+  <script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+  ga('create', 'UA-37357872-2', 'launchschool.com', {'name': 'secondtracker'});
+  ga('secondtracker.require', 'displayfeatures');
+  ga('secondtracker.require', 'linkid', 'linkid.js');
+  ga('secondtracker.send', 'pageview');
+</script>
+
+  </head>
+
+<body   >
+  <div class="wrapper">
+    <div class="wrapper-inside">
+      <div id="main">
+        <div id="content">
+          <div id="post-content">
+  <article class="hentry" role="article">
+    
+  <header>
+    
+      <h1 class="entry-title">Creación de Proyectos Ágiles usando integración continua</h1>
+    
+    
+      <p class="meta">
+        
+        
+      </p>
+    
+  </header>
+
+
+<div class="entry-content"><p>(Herramientas: Cloud9, Heroku, Travis y Code Climate en Django)</p>
+
+<h3>Objetivo</h3>
+<p>En este tutorial implementaremos una aplicación web con un ‘Hello World!’ usando Django para repasar algunos conceptos de integración continua, utilizando herramientas y servicios online libres, gratuitos y de calidad.</p>
+
+<h3>Integración Continua</h3>
+<p>A menudo la integración continua está asociada con las metodologías de desarrollo ágil y programación extrema. Se suele poner énfasis en la adaptabilidad porr sobre la previsibilidad, dado que esto nos ayuda a generar impacto de forma más rápida. Cambios de requisitos sobre la marcha son un aspecto natural, inevitable e incluso deseable del desarrollo de proyectos.
+</p><p>
+En el proceso tradicional de hacer software se suele trabajar haciendo grandes builds de los proyectos cada cierto tiempo, para luego hacer release de estos. La preparación para estos builds podía durar semanas, y a causa de esto no se podían hacer releases continuamente para pivotear de forma rápida (fail fast) para adaptarse a las necesidades de los proyectos.
+</p><p>
+Se idea entonces el concepto de la integración continua, en que se busca automatizar todo el proceso de testeo y deploy de las nuevas releases del software. En este proceso en general, se espera a que el servicio de testeo de un OK antes de hacer un deploy de un release para asegurar la estabilidad de estos. Se entiende que es fundamental el uso de TDD para construir software robusto.
+</p><p>
+El sistema de integración continua escucha las notificaciones que el sistema de versionamiento le envíe. En nuestra metodología, al menos cada vez que se hace un push en la rama develop y master (para ser más estrictos se puede agregar las ramas de feature), TravisCI escucha una notificación de Github donde Travis hace un pull del repositorio y corre los tests setteados por nosotros. Luego de que estos pasan, se avisa a Heroku, quien hace un pull del repositorio y hace un deploy de la nueva versión del software.
+</p><p>
+Además usaremos Cloud9, una IDE online colaborativa para facilitar el desarrollo enfocado en el aprendizaje (pair programming, mob programming). En C9 se puede también clonar un workspace, lo que simplifica el empezar a trabajar en el proyecto para nuevos integrantes a un equipo.
+</p>
+
+<h3>GitHub</h3>
+
+<p>Es un servicio web de hosting de repositorios Git. Ofrece todas las funcionalidades de Git para el control distribuido de versiones, agregando además sus propias features. Provee control de acceso, con usuario y contraseña y muchas otras funcionalidades de colaboración, como seguimiento de bugs e issues, wikis, visualización del árbol de trabajo de ramas, commits, ramas, etc, organización de milestones y releases, entre muchas otras cosas más. En particular, ahora último GitHub ha integrado el uso de Kanbans en el sitio web con los issues.
+</p><p>
+Lo interesante es que GitHub se ha asociado con las otras herramientas que ocuparemos en este tutorial, sincronizando las cuentas.</p>
+
+<h3>Step 1. Setup del Repositorio y C9</h3>
+
+<p>
+
+Primero creamos un repositorio vacío en <a href="http://www.github.com">GitHub</a>, para esto es necesario tener una cuenta en GitHub. Luego, creamos una cuenta en <a href="http://www.c9.io">C9</a> utilizando nuestra cuenta de GitHub para facilitar el proceso. Dentro de C9, creamos un nuevo espacio de trabajo o workspace. Seleccionamos la opción "Clone from Git or Mercurial URL" e ingresamos el url del repositorio en GitHub recién creado. Elegimos Django como template.
+<br/>
+Una vez dentro de nuestro workspace de C9, creamos una nueva aplicación Django llamada <code>my_app</code> (puedes cambiarle el nombre) utilizando el siguiente comando.
+</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'>django-admin.py startproject --template=https://github.com/heroku/heroku-django-template/archive/master.zip --name=Procfile my_app
+</span></code></pre></td></tr></table></div></figure>
+
+<p>
+Con esto, descargamos un template de Django con los elementos necesarios para que el proyecto funcione con heroku. Ahora, copiamos el contenido de la carpeta recién descargada my_app a nuestra carpeta principal. Luego, instalamos los requerimientos y hacemos push a github.
+</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'>sudo pip install -r requirements.txt
+</span><span class='line'>git add -A
+</span><span class='line'>git commit -m "initialize project"
+</span><span class='line'>git push origin master
+</span></code></pre></td></tr></table></div></figure>
+
+
+
+<h3>Step 2. Setup de Heroku</h3>
+
+<p>Para conectar nuestro proyecto a heroku debemos primero crearnos una cuenta en <a href="http://www.heroku.com">Heroku</a> y debemos descargar <a href="https://devcenter.heroku.com/articles/heroku-cli">Heroku Toolbelt</a>
+</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'>wget -O- https://toolbelt.heroku.com/install-ubuntu.sh | sh
+</span><span class='line'>heroku login
+</span></code></pre></td></tr></table></div></figure>
+
+<p>Luego, creamos un proyecto en heroku desde <a href="https://dashboard.heroku.com/new?org=personal-apps">este link</a> y le ponemos el nombre que queramos, digamos <code>project-name</code>. Luego, añadimos el remote de heroku al repositorio local de C9.
+</p>
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'>heroku git:remote -a project-name # reemplazar project-name
+</span><span class='line'>heroku run python manage.py migrate
+</span><span class='line'>heroku run python manage.py createsuperuser
+</span></code></pre></td></tr></table></div></figure>
+
+<p>
+Los dos últimos comandos ejecutan en el servidor de heroku los comandos <code>migrate</code> y <code>createsuperuser</code>.
+</p>
+
+<h3>Step 3. Setup de git-flow</h3>
+<p>
+  Ahora queremos instalar git-flow en nuestra máquina de C9. Para esto, en el terminal de C9 ejecutamos
+</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'>sudo apt-get update && sudo apt-get install git-flow
+</span><span class='line'>git flow init
+</span></code></pre></td></tr></table></div></figure>
+
+<p>
+Presionamos <code>Enter</code> hasta que ya no nos pida ingresar mas datos para dejar la configuración por defecto de git-flow.
+</p>
+
+<h3>Step 4. Setup de Travis</h3>
+<p>
+  Ahora queremos integrar Travis a nuestro proyecto. 
+</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'>wget "https://raw.githubusercontent.com/dxc/ChileAyuda-API/master/.travis.yml"  
+</span></code></pre></td></tr></table></div></figure>
+
+<p>
+  Luego iniciamos sesión en <a href="https://travis-ci.org/auth">Travis</a> usando nuestra cuenta de github. Una vez dentro, habilitamos nuestro repositorio <a href="https://travis-ci.org/profile/">aquí</a> para que esté integrado con Travis.
+</p>
+
+<h3>Step 5. Setup de Code Climate</h3>
+
+<p>Accedemos a <a href="https://codeclimate.com">CodeClimate</a> e iniciamos sesión con nuestra cuenta de github. Una vez dentro, agregamos nuestro repositorio al servicio. Obtenemos el token CODECLIMATE_REPO_TOKEN en la configuración del repo en Code Climate. Configuramos el token en la configuración de variables de entorno del repo en Travis CI (agregar llave/valor y apretar Add)</p>
+
+<p>
+  Crear el archivo .coveragerc con el siguiente contenido (cambiar django_app por el nombre de la aplicación correspondiente de Django). 
+</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'>[run]
+</span><span class='line'>branch = true
+</span><span class='line'>source = django_app
+</span><span class='line'>omit = manage.py,django_app/migrations/*,*/test*
+</span><span class='line'>
+</span><span class='line'>[html]
+</span><span class='line'>directory = coverage
+</span></code></pre></td></tr></table></div></figure>
+
+<p>
+  Luego de haberlo creado, debemos ignorarlo:
+</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'>nano .gitignore
+</span></code></pre></td></tr></table></div></figure>
+
+<p>
+  Y añadimos la línea <code>.coveragerc</code>.  Agregar lo siguiente a requirements-test.txt (si no existe el archivo, crearlo): 
+</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'>coverage
+</span></code></pre></td></tr></table></div></figure>
+
+<p>Reemplazar el contenido del archivo <code>.travis.yml</code> por lo siguiente:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'>language: python
+</span><span class='line'>python:
+</span><span class='line'>  - "2.7"
+</span><span class='line'>install:
+</span><span class='line'>  - pip install -r requirements.txt
+</span><span class='line'>  - pip install -r requirements-test.txt
+</span><span class='line'>  - pip install -U codeclimate-test-reporter
+</span><span class='line'>before_script:
+</span><span class='line'>  - python manage.py migrate
+</span><span class='line'>script: coverage run ./manage.py test
+</span><span class='line'>after_success: codeclimate-test-reporter
+</span></code></pre></td></tr></table></div></figure>
+
+<p>
+  Probar si es que se genera el reporte de coverage localmente. Para esto ejecutar:
+</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'>coverage run ./manage.py test
+</span><span class='line'>coverage html
+</span></code></pre></td></tr></table></div></figure>
+
+<p>
+  Lo anterior creará la carpeta coverage que contendrá el reporte de coverage del proyecto en formato HTML. Agregar esta carpeta a .gitignore
+</p>
+
+<h1>Trabajo futuro</h1>
+
+<p>
+  <ul>
+    <li>
+      Crear sección con la explicación del ciclo de desarrollo ágil y un ejemplo para hacer (TDD).
+    </li>
+    <li>
+      Añadir Coveralls (Test coverage)
+    </li>
+    <li>
+      Implementar el tutorial utilizando otros frameworks como Ruby on Rails.
+    </li>
+    <li>
+      Crear video.
+    </li>
+  </ul>
+</p>
+
+
+    <footer>
+      <p class="meta">
+        
+
+        
+
+
+
+
+
+
+
+  
+  
+
+
+<time datetime="2016-12-21T10:00:00+00:00" pubdate data-updated="true">Dic 21, 2016</time>
+        <span class="bullet-separator">&#8226;</span>
+        
+  
+
+<span class="byline author vcard">por <span class="fn">Sebastián Hernández y Elisa Kauffmann</span></span>
+
+
+        
+
+
+      </p>
+      
+
+      
+    </footer>
+  </article>
+  
+  
+</div>
+
+
+        </div>
+      </div>
+      
+
+
+
+
+
+
+<div id="fb-root"></div>
+<script>(function(d, s, id) {
+  var js, fjs = d.getElementsByTagName(s)[0];
+  if (d.getElementById(id)) {return;}
+  js = d.createElement(s); js.id = id; js.async = true;
+  js.src = "//connect.facebook.net/en_US/all.js#appId=212934732101925&xfbml=1";
+  fjs.parentNode.insertBefore(js, fjs);
+}(document, 'script', 'facebook-jssdk'));</script>
+
+
+
+  <script type="text/javascript">
+    (function() {
+      var script = document.createElement('script'); script.type = 'text/javascript'; script.async = true;
+      script.src = 'https://apis.google.com/js/plusone.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(script, s);
+    })();
+  </script>
+
+
+
+  <script type="text/javascript">
+    (function(){
+      var twitterWidgets = document.createElement('script');
+      twitterWidgets.type = 'text/javascript';
+      twitterWidgets.async = true;
+      twitterWidgets.src = '//platform.twitter.com/widgets.js';
+      document.getElementsByTagName('head')[0].appendChild(twitterWidgets);
+    })();
+  </script>
+
+
+
+
+
+    </div>
+    <footer role="contentinfo"><div class="wrapper-inside">
+  <nav class="nav clearfix">
+    <ul class="links">
+      <li><a href="/about_us">Tutorial realizado para el curso de Taller Avanzado de Desarrollo Ágil y Lean</a></li>
+    </ul>
+    <ul class="social-buttons">
+      <a href="mailto:seba.hg@me.com">
+        <li class="email">
+          <i class="fa fa-envelope"></i>
+        </li>
+      </a>
+      <a href="mailto:elisa.kauffmann.f@gmail.com">
+        <li class="email">
+          <i class="fa fa-envelope"></i>
+        </li>
+      </a>
+    </ul>
+  </nav>
+</div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/video.js/5.13.0/video.min.js"></script>
+<script src="/blog/javascripts/videojs.hotkeys.min.js" type="text/javascript"></script>
+<script>
+  $(document).ready(function() {
+    $('.video-js').each(function(idx) {
+      if (this.id === "") {
+        this.id = 'video_' + Date.now();
+      }
+
+      // for each videojs element, we need to activate the video-js-hotkeys plugin
+      videojs(this.id).ready(function() {
+        this.hotkeys({
+          alwaysCaptureHotkeys: true,
+          enableVolumeScroll: false
+        });
+      });
+    });
+  });
+</script>
+
+</footer>
+  </div>
+</body>
+</html>
