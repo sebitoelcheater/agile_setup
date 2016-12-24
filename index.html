@@ -63,18 +63,6 @@
   }
 </style>
 
-  <script>
-  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
-  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
-  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
-  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
-
-  ga('create', 'UA-37357872-2', 'launchschool.com', {'name': 'secondtracker'});
-  ga('secondtracker.require', 'displayfeatures');
-  ga('secondtracker.require', 'linkid', 'linkid.js');
-  ga('secondtracker.send', 'pageview');
-</script>
-
   </head>
 
 <body   >
@@ -118,16 +106,20 @@ Además usaremos Cloud9, una IDE online colaborativa para facilitar el desarroll
 <h3>GitHub</h3>
 
 <p>Es un servicio web de hosting de repositorios Git. Ofrece todas las funcionalidades de Git para el control distribuido de versiones, agregando además sus propias features. Provee control de acceso, con usuario y contraseña y muchas otras funcionalidades de colaboración, como seguimiento de bugs e issues, wikis, visualización del árbol de trabajo de ramas, commits, ramas, etc, organización de milestones y releases, entre muchas otras cosas más. En particular, ahora último GitHub ha integrado el uso de Kanbans en el sitio web con los issues.
-</p><p>
+</p>
+
+<p>
 Lo interesante es que GitHub se ha asociado con las otras herramientas que ocuparemos en este tutorial, sincronizando las cuentas.</p>
 
 <h3>Step 1. Setup del Repositorio y C9</h3>
 
+<ul>
+  <li><a href="https://github.com/new">Creamos un repositorio vacío en GitHub</a>, para esto es necesario tener una cuenta en GitHub.</li>
+  <li>Creamos una cuenta en <a href="http://www.c9.io">C9</a> utilizando nuestra cuenta de GitHub para facilitar el proceso.</li>
+  <li>Dentro de C9, <a href="https://c9.io/new">creamos un nuevo espacio de trabajo o workspace</a>. Seleccionamos la opción "Clone from Git or Mercurial URL" e ingresamos el url del repositorio en GitHub recién creado. Elegimos Django como template.</li>
+</ul>
 <p>
-
-Primero creamos un repositorio vacío en <a href="http://www.github.com">GitHub</a>, para esto es necesario tener una cuenta en GitHub. Luego, creamos una cuenta en <a href="http://www.c9.io">C9</a> utilizando nuestra cuenta de GitHub para facilitar el proceso. Dentro de C9, creamos un nuevo espacio de trabajo o workspace. Seleccionamos la opción "Clone from Git or Mercurial URL" e ingresamos el url del repositorio en GitHub recién creado. Elegimos Django como template.
-<br/>
-Una vez dentro de nuestro workspace de C9, creamos una nueva aplicación Django llamada <code>my_app</code> (puedes cambiarle el nombre) utilizando el siguiente comando.
+Una vez dentro de nuestro workspace de C9, creamos un nuevo proyecto Django llamado <code>my_app</code> (puedes cambiarle el nombre) utilizando el siguiente comando:
 </p>
 
 <figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
@@ -149,7 +141,6 @@ Con esto, descargamos un template de Django con los elementos necesarios para qu
 </span></code></pre></td></tr></table></div></figure>
 
 
-
 <h3>Step 2. Setup de Heroku</h3>
 
 <p>Para conectar nuestro proyecto a heroku debemos primero crearnos una cuenta en <a href="http://www.heroku.com">Heroku</a> y debemos descargar <a href="https://devcenter.heroku.com/articles/heroku-cli">Heroku Toolbelt</a>
@@ -161,19 +152,31 @@ Con esto, descargamos un template de Django con los elementos necesarios para qu
 </span><span class='line'>heroku login
 </span></code></pre></td></tr></table></div></figure>
 
-<p>Luego, creamos un proyecto en heroku desde <a href="https://dashboard.heroku.com/new?org=personal-apps">este link</a> y le ponemos el nombre que queramos, digamos <code>project-name</code>. Luego, añadimos el remote de heroku al repositorio local de C9.
+<p>Luego, creamos un proyecto en heroku desde <a href="https://dashboard.heroku.com/new?org=personal-apps">este link</a> y le ponemos el nombre que queramos, digamos <code>project-name</code>. Luego, añadimos el remote de heroku al repositorio local de C9 y hacemos push a heroku.
 </p>
 <figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
-<span class='line-number'>3</span>
 </pre></td><td class='code'><pre><code class='bash'><span class='line'>heroku git:remote -a project-name # reemplazar project-name
-</span><span class='line'>heroku run python manage.py migrate
+</span><span class='line'>git push heroku master
+</span></code></pre></td></tr></table></div></figure>
+
+<p>
+Con el proyecto listo en heroku, corremos las migraciones y creamos un superusuario para ingresar al admin.
+</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'>heroku run python manage.py migrate
 </span><span class='line'>heroku run python manage.py createsuperuser
 </span></code></pre></td></tr></table></div></figure>
 
 <p>
-Los dos últimos comandos ejecutan en el servidor de heroku los comandos <code>migrate</code> y <code>createsuperuser</code>.
+  Y listo! ahora podemos acceder a nuestra aplicación en producción.
 </p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'>heroku open
+</span></code></pre></td></tr></table></div></figure>
 
 <h3>Step 3. Setup de git-flow</h3>
 <p>
@@ -192,16 +195,61 @@ Presionamos <code>Enter</code> hasta que ya no nos pida ingresar mas datos para 
 
 <h3>Step 4. Setup de Travis</h3>
 <p>
-  Ahora queremos integrar Travis a nuestro proyecto. 
+  Ahora integraremos Travis a nuestro proyecto. Para esto es necesario crear un archivo que servirá como "receta" para decirle a travis qué es lo que queremos que haga. Creamos el archivo <code>.travis.yml</code> en el directorio principal del proyecto con el siguiente contenido (no olvidar reemplazar <code>my-app</code> por el nombre de tu proyecto):
 </p>
 
 <figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class='bash'><span class='line'>wget "https://raw.githubusercontent.com/dxc/ChileAyuda-API/master/.travis.yml"  
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'>language: python
+</span><span class='line'>python:
+</span><span class='line'>  - "3.5"
+</span><span class='line'>env:
+</span><span class='line'>  - DJANGO_SETTINGS_MODULE=my_app.settings
+</span><span class='line'># command to install dependencies
+</span><span class='line'>install:
+</span><span class='line'>  - pip install -r requirements.txt
+</span><span class='line'>  - pip install coveralls
+</span><span class='line'>  - python manage.py migrate
+</span><span class='line'># command to run tests
+</span><span class='line'>script:
+</span><span class='line'>  - python manage.py test
+</span><span class='line'>after_success:
+</span><span class='line'>  - coveralls
 </span></code></pre></td></tr></table></div></figure>
 
 <p>
-  Luego iniciamos sesión en <a href="https://travis-ci.org/auth">Travis</a> usando nuestra cuenta de github. Una vez dentro, habilitamos nuestro repositorio <a href="https://travis-ci.org/profile/">aquí</a> para que esté integrado con Travis.
-</p>
+  Luego iniciamos sesión en <a href="https://travis-ci.org/auth">Travis</a> usando nuestra cuenta de github. Una vez dentro, habilitamos nuestro repositorio <a href="https://travis-ci.org/profile/">aquí</a> para que esté integrado con Travis. Además, queremos que si pasan los tests en travis, se realice automáticamente el deploy a heroku:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'>gem install travis
+</span><span class='line'>travis login
+</span><span class='line'>travis setup heroku --force
+</span></code></pre></td></tr></table></div></figure>
+
+<p>Al correr <code>travis login</code> iniciamos sesión con github, y al correr <code>travis setup heroku --force</code> respondemos <code>yes</code> a todo lo que nos pregunten. Este último comando añade la opción para hacer el deploy y los datos necesarios para esto en el <code>.travis.yml</code>. Luego, es hora de hacer commit de los cambios a <code>.travis.yml</code> y luego push. Luego del push, deberíamos poder entrar a <a href="https://travis-ci.org">Travis</a> y ver cómo todos nuestros tests pasan.</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'>git add -A
+</span><span class='line'>git commit -m "travis integration"
+</span><span class='line'>git push origin master
+</span></code></pre></td></tr></table></div></figure>
 
 <h3>Step 5. Setup de Code Climate</h3>
 
